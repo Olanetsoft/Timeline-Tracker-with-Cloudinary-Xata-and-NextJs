@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const Navbar = () => {
+const Navbar = ({ isAuthenticated }) => {
   const router = useRouter();
 
   return (
@@ -15,15 +15,27 @@ const Navbar = () => {
               Build a Timeline Tracker with Cloudinary, Xata and NextJs
             </Link>
           </h1>
-          <button
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={() => {
-              router.push("/register");
-            }}
-          >
-            Create a Timeline
-          </button>
+          {isAuthenticated ? (
+            <button
+              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={() => {
+                router.push("/upload");
+              }}
+            >
+              Add New Timeline
+            </button>
+          ) : (
+            <button
+              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={() => {
+                router.push("/register");
+              }}
+            >
+              Register or Login to Create a Timeline
+            </button>
+          )}
         </header>
       </div>
     </div>

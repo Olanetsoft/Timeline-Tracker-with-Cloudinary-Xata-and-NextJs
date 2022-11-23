@@ -1,0 +1,7 @@
+{
+  "databaseURL": "https://Olubisi-Idris-Ayinde-s-workspace-rdqm16.us-east-1.xata.sh/db/timeline",
+  "codegen": {
+    "output": "src/xata.js",
+    "moduleType": "esm"
+  }
+}

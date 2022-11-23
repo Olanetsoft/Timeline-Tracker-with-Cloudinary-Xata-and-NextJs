@@ -9,12 +9,16 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     console.log("Submitting form");
     console.log(email, password, firstName, lastName);
-    fetch("http://localhost:3000/api/register", {
+
+    await fetch("/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,9 +36,11 @@ const Register = () => {
         if (data.error) {
           setError(data.error);
         } else {
-          router.push("/");
+          router.push("/login");
         }
       });
+
+    setLoading(false);
   };
 
   return (
@@ -56,6 +62,7 @@ const Register = () => {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              required
             />
 
             <input
@@ -65,6 +72,7 @@ const Register = () => {
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              required
             />
 
             <input
@@ -74,6 +82,7 @@ const Register = () => {
               placeholder="Email"
               onChange={(e) => setEmail(e.target.value)}
               value={email}
+              required
             />
 
             <input
@@ -83,13 +92,15 @@ const Register = () => {
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
               value={password}
+              required
             />
 
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4 mb-4"
               type="submit"
+              disabled={loading}
             >
-              Register
+              {loading ? "Loading..." : "Register"}
             </button>
             {error && <p className="text-red-500">{error}</p>}
 

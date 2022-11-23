@@ -5,20 +5,34 @@ const Upload = () => {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
+  const [timeline, setTimeline] = useState("");
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  function handleOnChange(changeEvent) {
+    const reader = new FileReader(); // create new reader to read image file as a data URL
+    reader.onload = function (onLoadEvent) {
+      setFile(onLoadEvent.target.result); // save base64 encoded version of image
+    };
+    reader.readAsDataURL(changeEvent.target.files[0]);
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form");
-    console.log(file, title, description, date);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    fetch("http://localhost:3000/api/upload", {
+    setLoading(true);
+
+    console.log("Submitting form...");
+
+    await fetch("/api/upload", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify({
+        title,
+        description,
+        timeline,
+        image: file,
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -29,6 +43,8 @@ const Upload = () => {
           router.push("/");
         }
       });
+
+    setLoading(false);
   };
 
   return (
@@ -48,6 +64,7 @@ const Upload = () => {
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            required
           />
 
           <input
@@ -57,6 +74,7 @@ const Upload = () => {
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            required
           />
 
           <input
@@ -64,8 +82,9 @@ const Upload = () => {
             type="date"
             name="Date"
             placeholder="Date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            value={timeline}
+            onChange={(e) => setTimeline(e.target.value)}
+            required
           />
 
           <div className="mb-4">
@@ -73,15 +92,18 @@ const Upload = () => {
               className="form-control block w-full px-2 py-2 text-l font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none mt-2 mb-8"
               type="file"
               name="file"
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={handleOnChange}
+              required
             />
           </div>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
+            disabled={loading}
           >
-            Upload
+            {loading ? "Loading..." : "Submit"}
           </button>
+          {error && <p className="text-red-500 text-xs italic">{error}</p>}
         </form>
       </div>
     </div>

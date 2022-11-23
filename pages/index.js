@@ -5,7 +5,12 @@ import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 import styles from "../styles/Home.module.css";
 
-export default function Home() {
+import { getXataClient } from "../src/xata";
+
+export default function Home({ records, isAuthenticated }) {
+  const router = useRouter();
+  const userId = router.query.userId; // retrieve userId
+
   return (
     <div className={styles.container}>
       <Head>
@@ -16,63 +21,54 @@ export default function Home() {
 
       <main className={styles.main}>
         <div className="relative container mx-auto px-6 flex flex-col space-y-2">
-          <Navbar />
+          <Navbar isAuthenticated={isAuthenticated} userId={userId} />
 
-          <div class="relative right-40">
+          <div className="relative right-40">
             <div className="absolute z-0 w-2 h-full bg-white shadow-md inset-10 left-17 md:mx-auto md:right-0 md:left-0"></div>
-            <div className="relative z-10">
-              <Image
-                src="https://images.pexels.com/photos/885880/pexels-photo-885880.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=100"
-                alt=""
-                className="timeline-img"
-                width={100}
-                height={100}
-              />
-              <div className="timeline-container">
-                <div className="timeline-pointer" aria-hidden="true"></div>
-                <div className="bg-white p-6 rounded-md shadow-md">
-                  <span className="font-bold text-indigo-600 text-sm tracking-wide">
-                    Jan 2021
-                  </span>
-                  <h1 className="text-2xl font-bold pt-1 text-gray-900">
-                    An amazing travel
-                  </h1>
-                  <p className="pt-1 text-gray-800">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ex
-                    iste suscipit reiciendis, perferendis vel consequuntur
-                    cupiditate ad commodi provident, sapiente veniam sed autem.
-                  </p>
+            {records.map((record, index) => {
+              return (
+                <div className="relative z-10" key={index}>
+                  <Image
+                    src={record.image_url}
+                    alt=""
+                    className="timeline-img"
+                    width={100}
+                    height={100}
+                  />
+                  <div className="timeline-container">
+                    <div className="timeline-pointer" aria-hidden="true"></div>
+                    <div className="bg-white p-6 rounded-md shadow-md">
+                      <span className="font-bold text-indigo-600 text-sm tracking-wide">
+                        {record.timeline}
+                      </span>
+                      <h1 className="text-2xl font-bold pt-1 text-gray-900">
+                        {record.title}
+                      </h1>
+                      <p className="pt-1 text-gray-800">{record.description}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="relative z-10">
-              <Image
-                src="https://images.pexels.com/photos/885880/pexels-photo-885880.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=100"
-                alt=""
-                className="timeline-img"
-                width={100}
-                height={100}
-              />
-              <div className="timeline-container">
-                <div className="timeline-pointer" aria-hidden="true"></div>
-                <div className="bg-white p-6 rounded-md shadow-md">
-                  <span className="font-bold text-indigo-600 text-sm tracking-wide">
-                    Jan 2021
-                  </span>
-                  <h1 className="text-2xl font-bold pt-1 text-gray-900">
-                    An amazing travel
-                  </h1>
-                  <p className="pt-1 text-gray-800">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ex
-                    iste suscipit reiciendis, perferendis vel consequuntur
-                    cupiditate ad commodi provident, sapiente veniam sed autem.
-                  </p>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </main>
     </div>
   );
 }
+
+export const getServerSideProps = async (context) => {
+  let isAuthenticated;
+  context.req.cookies["token"]
+    ? (isAuthenticated = true)
+    : (isAuthenticated = false);
+
+  const xata = getXataClient();
+
+  const records = await xata.db.timelines
+    .select(["*", "user.firstName", "user.lastName"])
+    .sort("title", "desc")
+    .getAll();
+
+  return { props: { records, isAuthenticated } };
+};
