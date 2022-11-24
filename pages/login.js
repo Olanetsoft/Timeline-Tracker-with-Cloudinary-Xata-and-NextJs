@@ -82,7 +82,7 @@ const Login = () => {
                 href="/register"
                 className="text-blue-500 hover:text-blue-700 no-underline hover:underline cursor-pointer text-md mt-6"
               >
-                Don't have an account? Register here
+                Don&apos;t have an account? Register here
               </Link>
             </p>
           </div>
