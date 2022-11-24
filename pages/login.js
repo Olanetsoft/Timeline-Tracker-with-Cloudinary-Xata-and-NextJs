@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const Login = () => {
   const router = useRouter();
@@ -77,12 +78,12 @@ const Login = () => {
             {error && <p className="text-red-500 text-xs italic">{error}</p>}
 
             <p className="text-center text-gray-500 text-sm mt-6">
-              <a
-                className="text-blue-500 hover:text-blue-700 no-underline hover:underline cursor-pointer text-md mt-6"
+              <Link
                 href="/register"
+                className="text-blue-500 hover:text-blue-700 no-underline hover:underline cursor-pointer text-md mt-6"
               >
                 Don't have an account? Register here
-              </a>
+              </Link>
             </p>
           </div>
         </form>
